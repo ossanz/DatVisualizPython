@@ -1,5 +1,4 @@
 
-
 import dash
 from dash import dcc
 from dash import html
@@ -52,7 +51,7 @@ app.layout = html.Div([
             value='1980'
         )),
     html.Div([#TASK 2.3: Add a division for output display
-        html.Div(id='output-container', className='chart-grid', style={'display': 'flex'})
+        html.Div(id='output-container', className='chart-grid', style={'display': 'flex'}),
     ])
 ])
 
@@ -92,21 +91,23 @@ def update_output_container(selected_statistics, input_year):
 
 
         #Plot 2 Calculate the average number of vehicles sold by vehicle type and represent as a Bar chart
-        avg_by_type=recession_data.groupby('Vehicle_Type')['Automobile_Sales'].mean.reset_index()
+        print("recession data es:",recession_data)
+        avg_by_type=recession_data.groupby('Vehicle_Type')['Automobile_Sales'].mean().reset_index()
+        #['Automobile_Sales'].mean().reset_index()
+        print("avg_by_type data es:", avg_by_type)
         R_chart2 = dcc.Graph(
             figure=px.bar(avg_by_type, 
-                x='Year',
+                x='Vehicle_Type',
                 y='Automobile_Sales',
-                #hue='Vehicle_Type',
                 title="average number of vehicles sold by vehicle type"))
 
 
         # Plot 3 : Pie chart for total expenditure share by vehicle type during recessions
             # grouping data for plotting
-        exp_rec= recession_data.groupby('Vehicle_Type').sum().reset_index()
+        exp_rec= recession_data.groupby('Vehicle_Type')['Advertising_Expenditure'].mean().reset_index()
         R_chart3 = dcc.Graph(
-                figure=px.pie(exp_rec,
-                values='Automobile_Sales',
+            figure=px.pie(exp_rec,
+                values='Advertising_Expenditure',
                 names='Vehicle_Type',
                 title="total expenditure share by vehicle type during recessions"
             )
@@ -114,27 +115,37 @@ def update_output_container(selected_statistics, input_year):
 
 
         # Plot 4 Develop a Bar chart for the effect of unemployment rate on vehicle type and sales
-        eff_unempl=recession_data.groupby('Vehicle_Type', 'Unemployment_Rate')['Automobile_Sales'].mean.reset_index()
+        eff_unempl=recession_data.groupby(['Vehicle_Type', 'unemployment_rate'])['Automobile_Sales'].mean.reset_index()
         R_chart4 = dcc.Graph(
             figure=px.bar(eff_unempl, 
-                x='Unemployment_Rate',
+                x='unemployment_rate',
                 y='Automobile_Sales',
-                hue='Vehicle_Type',
+                #hue='Vehicle_Type',
                 title="effect of unemployment rate on vehicle type and sales"))
 
         return [
-            html.Div(className='chart-item', children=[html.Div(children=R_chart1),html.Div(children=R_chart2)]),
-            html.Div(className='chart-item', children=[html.Div(children=R_chart3),html.Div(children=R_chart4)])
-            ]
-                           
+                    #html.Div(className='chart-item', children=[html.Div(children=R_chart1),
+                    #                                           html.Div(children=R_chart2),
+                    #                                           html.Div(children=R_chart3),
+                    #                                           html.Div(children=R_chart4)],
+                    #                                             style={'display': 'flex'}),
+                    html.Div(className='chart-item', children=[html.Div(children=R_chart1),html.Div(children=R_chart2)],style={'display': 'flex'}),
+                    html.Div(className='chart-item', children=[html.Div(children=R_chart3),html.Div(children=R_chart4)],style={'display': 'flex'})
+            
+                    #html.Div(className='chart-item', children=[html.Div(children=R_chart1)]),
+                    #html.Div(className='chart-item', children=[html.Div(children=R_chart2)]),
+                    #html.Div(className='chart-item', children=[html.Div(children=R_chart3)]),
+                    #html.Div(className='chart-item', children=[html.Div(children=R_chart4)])
+                    ]
     elif (input_year and selected_statistics=='Yearly Statistics'):
-        yearly_data = data[data['Year'] == input_year]                                        
+        yearly_data = data[data['Year'] == input_year]
+        print (yearly_data)
         #plot 1 Yearly Automobile sales using line chart for the whole period.
         yas= data.groupby('Year')['Automobile_Sales'].mean().reset_index()
         Y_chart1 = dcc.Graph(figure=px.line(yas, x='Year', y='Automobile_Sales', title='Yearly Automobile sales'))
             
         # Plot 2 Total Monthly Automobile sales using line chart.
-        mas= yearly_data.groupby('Month')['Automobile_Sales'].sum()
+        mas= yearly_data.groupby('Month')['Automobile_Sales'].sum().reset_index()
         print (mas)
         Y_chart2 = dcc.Graph(figure=px.line(mas, x='Month', y='Automobile_Sales', title='Monthly Automobile sales'))
 
@@ -144,18 +155,25 @@ def update_output_container(selected_statistics, input_year):
 
         # Plot 4 Total Advertisement Expenditure for each vehicle using pie chart
         exp_data=yearly_data.groupby('Vehicle_Type').sum().reset_index()
-        Y_chart4 = dcc.Graph(
-            figure=px.pie(exp_data,
-                          values='Advertising_Expenditure',
-                          names='Vehicle_Type',
-                          title="Total Advertisement Expenditure for each vehicle type")
-        )
+        Y_chart4 = dcc.Graph(figure=px.pie(exp_data,values='Advertising_Expenditure', names='Vehicle_Type', title="Total Advertisement Expenditure for each vehicle type"))
 
 #TASK 2.6: Returning the graphs for displaying Yearly data
         return [
+            
+            #html.Div(className='chart-item', children=[html.Div(children=Y_chart1),
+            #                                           html.Div(children=Y_chart2),
+            #                                           html.Div(children=Y_chart3),
+            #                                           html.Div(children=Y_chart4)],
+            #                                            style={'display': 'flex'}),
             html.Div(className='chart-item', children=[html.Div(children=Y_chart1),html.Div(children=Y_chart2)],style={'display': 'flex'}),
             html.Div(className='chart-item', children=[html.Div(children=Y_chart3),html.Div(children=Y_chart4)],style={'display': 'flex'})
-            ]
+            
+            
+            #html.Div(className='chart-item', children=[html.Div(children=Y_chart1)]),
+            #html.Div(className='chart-item', children=[html.Div(children=Y_chart2)]),
+            #html.Div(className='chart-item', children=[html.Div(children=Y_chart3)]),
+            #html.Div(className='chart-item', children=[html.Div(children=Y_chart4)])
+                    ]
         
     else:
         return None
