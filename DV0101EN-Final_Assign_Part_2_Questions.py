@@ -1,4 +1,6 @@
 
+
+
 import dash
 from dash import dcc
 from dash import html
@@ -45,7 +47,7 @@ app.layout = html.Div([
             placeholder='Select a year',
             style={'textAlign': 'center', 'color': '#503D36',
                 'font-size': 26},
-            value='select-year'
+            value='Select-year'
         )),
     html.Div([#TASK 2.3: Add a division for output display
         html.Div(id='output-container', className='chart-grid', style={'display': 'flex'}),
@@ -70,8 +72,8 @@ def update_input_container(selected_statistics) :
     Output(component_id='output-container', component_property='children'),
     [Input(component_id='dropdown-statistics', component_property='value'), Input(component_id='select-year', component_property='value')])
 
-def update_output_container(selected_statistics, input_year):
-    if selected_statistics == 'Recession Period Statistics':
+def update_output_container(selected_statistics, input_year) :
+    if selected_statistics == 'Recession Period Statistics' :
         # Filter the data for recession periods
         recession_data = data[data['Recession'] == 1]
     
@@ -117,8 +119,10 @@ def update_output_container(selected_statistics, input_year):
             figure=px.bar(eff_unempl, 
                 x='unemployment_rate',
                 y='Automobile_Sales',
-                #hue='Vehicle_Type',
-                title="effect of unemployment rate on vehicle type and sales"))
+                color='Vehicle_Type',
+                labels={'unemployment_rate': 'Unemployment Rate', 'Automobile_Sales': 'Average Automobile Sales'},
+                title="Effect of Unemployment Rate on Sales of various Vehicle Types")
+        )
 
         return [
                     #html.Div(className='chart-item', children=[html.Div(children=R_chart1),
